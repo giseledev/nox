@@ -73,3 +73,21 @@ Para sair do modo interativo, digite sair ou exit.
 
 NOTA SOBRE TOKENS
 Os tokens aritmeticos ja existentes (+, -, *, /, **, parenteses e atribuicao) sao suficientes para o foco matematico. Os tokens de comparacao permanecem por compatibilidade com o parser; nao impedem o uso especializado da linguagem.
+
+
+APRESENTACAO DA RESOLUCAO
+
+A funcao BHASKARA mostra a conta em portugues, usando o nome "raiz quadrada" por extenso junto do simbolo matematico. A explicacao foi resumida para mostrar somente a formula, a substituicao dos coeficientes, o valor do discriminante e as raizes.
+
+Exemplo de apresentacao:
+
+Resolucao da equacao:
+Equacao: 1x² + (-3)x + (2) = 0
+Discriminante: Δ = b² - 4ac
+Substituindo: Δ = (-3)² - 4 × (1) × (2)
+Calculando: Δ = 9 - 8 = 1
+Formula resolutiva: x = (-b ± √Δ) / (2a)
+Raiz quadrada do discriminante: √Δ = √1 = 1
+Primeira raiz: x₁ = (3 + 1) / 2 = 2
+Segunda raiz: x₂ = (3 - 1) / 2 = 1
+Resultado: x₁ = 2 e x₂ = 1.
