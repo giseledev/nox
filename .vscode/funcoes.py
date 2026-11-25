@@ -47,14 +47,14 @@ def montar_etapas(a, b, c):
     delta = b2 - quatro_ac
     etapas = [
         f"Equacao: {a}x^2 + ({b})x + ({c}) = 0",
-        "Etapa 1 - Formula do discriminante: delta = b^2 - 4*a*c. O delta mostra quantas raizes reais a equação tem.",
+        "Etapa 1 - Formula do discriminante: delta = b^2 - 4*a*c. O delta mostra quantas raizes reais a equacao tem.",
         f"Etapa 2 - Substituicao: aqui a = {a}, b = {b} e c = {c}. Trocando na formula: delta = ({b})^2 - 4*({a})*({c})",
         f"Etapa 3 - Calculo: primeiro o quadrado e o produto, depois a subtracao: delta = {_fmt(b2)} - {_fmt(quatro_ac)} = {_fmt(delta)}",
     ]
 
     if delta < 0:
         etapas.append(
-            "Etapa 4 - Como delta < 0, não existe raiz quadrada real de numero negativo."
+            "Etapa 4 - Como delta < 0, nao existe raiz quadrada real de numero negativo. "
             "A equacao nao possui raizes reais (a parabola nao toca o eixo x)."
         )
         return etapas, []
