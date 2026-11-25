@@ -72,10 +72,10 @@ def montar_etapas(a, b, c):
         situacao = "Como delta > 0, existem duas raizes reais diferentes"
 
     etapas.extend([
-        f"Etapa 4 - Formula resolutiva: x = (-b +/- sqrt(delta)) / (2*a). {situacao}: o sinal + gera x1 e o sinal - gera x2.",
-        f"Etapa 5 - Substituicao de x1: usando o sinal +, x1 = (-({b}) + sqrt({_fmt(delta)})) / (2*({a}))",
+        f"Etapa 4 - Formula resolutiva: x = (-b +/- raiz(delta)) / (2*a). {situacao}: o sinal de + gera x1 e o sinal de - gera x2.",
+        f"Etapa 5 - Substituicao de x1: usando o sinal +, x1 = (-({b}) + raiz({_fmt(delta)})) / (2*({a}))",
         f"Etapa 6 - Calculo de x1: x1 = ({_fmt(-b)} + {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x1)}",
-        f"Etapa 7 - Substituicao de x2: usando o sinal -, x2 = (-({b}) - sqrt({_fmt(delta)})) / (2*({a}))",
+        f"Etapa 7 - Substituicao de x2: usando o sinal -, x2 = (-({b}) - raiz({_fmt(delta)})) / (2*({a}))",
         f"Etapa 8 - Calculo de x2: x2 = ({_fmt(-b)} - {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x2)}",
     ])
     if delta == 0:
