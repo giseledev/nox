@@ -3,108 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOX - Bhaskara passo a passo</title>
+<title>NOX - Equação do 2º grau passo a passo</title>
 <style>
   :root {
-    --bg: #f5f6fa; --card: #ffffff; --texto: #1d2230; --suave: #6b7388;
-    --borda: #dde1ec; --destaque: #4f46e5; --destaque-texto: #ffffff;
-    --ok: #0f9d58; --erro: #d93025; --atual: #eef0ff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #12141c; --card: #1b1e2a; --texto: #e8eaf3; --suave: #9aa1b8;
-      --borda: #2c3042; --destaque: #7c83ff; --destaque-texto: #12141c;
-      --ok: #3ddc84; --erro: #ff6b60; --atual: #252a45;
-    }
+    --papel: #f6faff; --grade: #d9e6f6; --tinta: #1b2a4a; --tinta-suave: #52627f;
+    --caneta: #2f5fd0; --caneta-fundo: #e8efff;
+    --roxo: #7a3fc4; --roxo-fundo: #f1e9fc;
+    --marca: #ffe66d; --marca-fundo: #fff6c4; --marca-borda: #ecd35a;
+    --margem: #e8575a; --certo: #1f9d63; --certo-fundo: #e5f6ed;
+    --erro: #c4302b; --folha: #ffffff; --borda: #c9d8ee;
+    --manuscrito: "Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", cursive;
+    --texto: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --math: "Cambria Math", Cambria, Georgia, "Times New Roman", serif;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; background: var(--bg); color: var(--texto);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.5; padding: 24px 16px;
+    margin: 0; color: var(--tinta); font-family: var(--texto); line-height: 1.5;
+    background-color: var(--papel);
+    background-image:
+      linear-gradient(var(--grade) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+    background-size: 26px 26px;
+    padding: 28px 16px 48px;
   }
-  main { max-width: 680px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin: 0 0 4px; }
-  .sub { color: var(--suave); margin: 0 0 20px; }
-  .card {
-    background: var(--card); border: 1px solid var(--borda);
-    border-radius: 14px; padding: 18px; margin-bottom: 16px;
+  main {
+    max-width: 1240px; margin: 0 auto; padding-left: 26px;
+    border-left: 3px solid var(--margem);
+  }
+  h1 { font-family: var(--manuscrito); font-size: 2rem; line-height: 1.2; margin: 0 0 4px; color: var(--caneta); }
+  .sub { color: var(--tinta-suave); margin: 0 0 22px; font-size: 1.05rem; }
+  h2 { font-family: var(--manuscrito); font-size: 1.25rem; margin: 0 0 12px; color: var(--tinta); }
+
+  .folha {
+    background: var(--folha); border: 1px solid var(--borda); border-radius: 8px;
+    padding: 20px; margin-bottom: 18px; box-shadow: 0 2px 0 var(--borda);
   }
   .aviso {
-    background: var(--atual); border: 1px dashed var(--destaque);
-    border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;
-    font-size: .9rem; display: none;
+    display: none; background: var(--marca-fundo); border: 1px dashed var(--marca-borda);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; font-size: .92rem;
   }
-  .campos { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
-  label { display: flex; flex-direction: column; font-size: .85rem; color: var(--suave); gap: 4px; }
+
+  .campos { display: flex; gap: 14px; flex-wrap: wrap; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 4px; font-family: var(--manuscrito); font-size: 1.1rem; color: var(--caneta); }
   input {
-    width: 90px; padding: 10px; font-size: 1.1rem; text-align: center;
-    border: 1px solid var(--borda); border-radius: 8px;
-    background: var(--bg); color: var(--texto);
+    width: 92px; padding: 10px 8px; font: 600 1.3rem var(--math); text-align: center;
+    color: var(--tinta); background: var(--papel);
+    border: 2px solid var(--borda); border-radius: 8px;
   }
+  input:focus { border-color: var(--caneta); outline: none; background: #fff; }
   button {
-    font: inherit; cursor: pointer; border-radius: 10px;
-    border: 1px solid var(--borda); background: var(--card); color: var(--texto);
-    padding: 10px 16px;
+    font: 600 1rem var(--texto); cursor: pointer; border-radius: 8px;
+    border: 2px solid var(--borda); background: var(--folha); color: var(--tinta);
+    padding: 10px 18px;
   }
-  button.principal {
-    background: var(--destaque); color: var(--destaque-texto);
-    border-color: var(--destaque); font-weight: 600;
+  button:hover:not(:disabled) { border-color: var(--caneta); }
+  button.principal { background: var(--caneta); border-color: var(--caneta); color: #fff; }
+  button.principal:hover:not(:disabled) { background: #2450b4; border-color: #2450b4; }
+  button.marca { background: var(--marca); border-color: var(--marca-borda); }
+  button.marca:hover:not(:disabled) { border-color: #c9ad25; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--caneta); outline-offset: 2px; }
+
+  .topo { display: flex; gap: 20px 28px; align-items: center; flex-wrap: wrap; }
+  .equacao {
+    flex: 1; min-width: 240px; text-align: center;
+    font: italic 2.1rem var(--math); letter-spacing: .02em; color: var(--tinta);
   }
-  button:disabled { opacity: .35; cursor: not-allowed; }
-  button:focus-visible, input:focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
-  .eq { margin-top: 10px; color: var(--suave); font-size: .9rem; }
-  #passos { list-style: none; margin: 0; padding: 0; }
-  #passos li {
-    padding: 10px 14px; border-radius: 10px; margin-bottom: 8px;
-    border: 1px solid var(--borda); font-family: ui-monospace, Consolas, monospace;
-    font-size: .95rem; word-break: break-word;
+  .equacao span { background: linear-gradient(transparent 62%, var(--marca) 62%); padding: 0 6px; }
+
+  /* Tabuleiro: as etapas viram casas de um caminho em zigue-zague */
+  .tabuleiro { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 38px; margin: 10px 4px 22px; }
+  .passo {
+    position: relative; padding: 12px 14px; border-radius: 8px; min-height: 118px;
+    background: var(--folha); border: 1px solid var(--borda); color: var(--tinta-suave);
   }
-  #passos li.atual { background: var(--atual); border-color: var(--destaque); }
-  #passos li.antigo { color: var(--suave); }
-  .controles { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; }
-  .controles button { font-size: 1.05rem; min-width: 120px; }
-  #contador { color: var(--suave); font-size: .9rem; text-align: center; }
-  #resultado {
-    display: none; margin-top: 12px; padding: 14px; border-radius: 10px;
-    border: 2px solid var(--ok); font-size: 1.15rem; font-weight: 600;
+  .passo .topo-passo { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .passo .num {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; font: 700 .95rem var(--math);
+    color: #fff; background: var(--caneta);
   }
+  .passo.t-raiz .num { background: var(--roxo); }
+  .passo.t-fim .num { background: var(--certo); }
+  .passo.t-eq .num { background: var(--tinta); }
+  .passo .tit { font-family: var(--manuscrito); font-size: 1rem; line-height: 1.2; color: var(--tinta); }
+  .passo .txt { font-size: .96rem; line-height: 1.45; word-break: break-word; }
+  .passo.atual {
+    background: var(--marca-fundo); border-color: var(--marca-borda); color: var(--tinta);
+    box-shadow: 0 2px 0 var(--marca-borda);
+  }
+  .passo.atual::before {
+    content: ""; position: absolute; top: -11px; right: -11px; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--margem); border: 3px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .passo.futuro { background: transparent; border: 2px dashed var(--borda); }
+  .passo.futuro .num { background: var(--borda); color: var(--tinta-suave); }
+  .passo.futuro .tit, .passo.futuro .txt { visibility: hidden; }
+  .passo::after {
+    position: absolute; width: 28px; height: 28px; line-height: 24px; text-align: center;
+    border-radius: 50%; background: #fff; border: 2px solid var(--borda); color: var(--caneta); font-weight: 700;
+  }
+  .passo.r::after { content: "→"; right: -33px; top: calc(50% - 14px); }
+  .passo.l::after { content: "←"; left: -33px; top: calc(50% - 14px); }
+  .passo.d::after { content: "↓"; bottom: -33px; left: calc(50% - 14px); }
+
+  .chegada {
+    border-radius: 8px; padding: 14px 16px; min-height: 118px;
+    border: 2px dashed var(--certo); color: var(--tinta-suave);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .chegada.pronta { background: var(--folha); border-style: solid; color: var(--tinta); }
+  .chegada .rotulo { font-family: var(--manuscrito); color: var(--certo); font-size: 1.1rem; }
+  .chegada .valor { font: 600 1.45rem var(--math); margin-bottom: 8px; }
+
+  .controles { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; }
+  .controles button { min-width: 124px; font-size: 1.05rem; }
+  #contador { color: var(--tinta-suave); font-size: .95rem; text-align: center; }
   #erro {
-    display: none; color: var(--erro); border: 1px solid var(--erro);
-    border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; white-space: pre-wrap;
+    display: none; color: var(--erro); background: #fff; border: 2px solid var(--erro);
+    border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; white-space: pre-wrap;
   }
-  .dica { color: var(--suave); font-size: .85rem; margin-top: 8px; }
+  .dica { color: var(--tinta-suave); font-size: .88rem; margin: 10px 0 0; }
+
+  #grafico svg { width: 100%; height: auto; max-height: 270px; display: block; margin: 0 auto; }
+  .g-grade { stroke: #dbe7f7; stroke-width: 1; }
+  .g-eixo { stroke: var(--tinta); stroke-width: 1.8; }
+  .g-curva { fill: none; stroke: var(--caneta); stroke-width: 3.4; stroke-linecap: round; }
+  .g-raiz { fill: var(--certo); stroke: #fff; stroke-width: 2.5; }
+  .g-vertice { fill: #fff; stroke: var(--roxo); stroke-width: 2.5; }
+  .g-txt { fill: var(--tinta-suave); font-size: 12px; font-family: var(--texto); }
+  .g-vtxt { fill: var(--roxo); font-size: 12px; font-weight: 600; font-family: var(--texto); }
+  .g-raiz-txt { fill: var(--certo); font-size: 14px; font-weight: 700; font-family: var(--texto);
+    paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+  .legenda { color: var(--tinta-suave); margin: 6px 0 0; font-size: .92rem; }
+
+  @media (max-width: 560px) {
+    main { padding-left: 14px; }
+    h1 { font-size: 1.6rem; }
+    .equacao { font-size: 1.6rem; flex-basis: 100%; }
+    input { width: 78px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>NOX · Equação do 2º grau</h1>
-  <p class="sub">Digite os valores de a, b e c e acompanhe a resolução passo a passo.</p>
+  <h1>Equação do 2º grau</h1>
+  <p class="sub">Digite a, b e c e veja a resolução passo a passo.</p>
+  <p class="sub"><b>Clique em Avançar</b> para ver a próxima etapa.</p>
 
   <div id="aviso" class="aviso">
-    Modo de teste: a NOX não está conectada, então esta tela mostra uma resposta de exemplo (a=1, b=-3, c=2).
+    Modo de teste: a NOX não está conectada, então esta tela mostra uma resposta de exemplo (a = 1, b = -3, c = 2).
   </div>
 
-  <section class="card">
+  <section class="folha topo">
     <form id="form" class="campos">
       <label>a <input id="a" inputmode="decimal" value="1" autocomplete="off"></label>
       <label>b <input id="b" inputmode="decimal" value="-3" autocomplete="off"></label>
       <label>c <input id="c" inputmode="decimal" value="2" autocomplete="off"></label>
       <button type="submit" class="principal">Resolver</button>
     </form>
-    <div class="eq" id="eq">ax² + bx + c = 0</div>
+    <div class="equacao" id="eq" aria-live="polite"></div>
   </section>
 
   <div id="erro" role="alert"></div>
 
-  <section class="card" id="areaPassos" hidden>
-    <ul id="passos" aria-live="polite"></ul>
+  <section class="folha" id="areaPassos" hidden>
+    <div class="tabuleiro" id="tabuleiro" aria-live="polite"></div>
     <div class="controles">
       <button id="voltar" type="button" aria-label="Voltar uma etapa">◀ Voltar</button>
       <span id="contador"></span>
       <button id="avancar" type="button" class="principal" aria-label="Avançar uma etapa">Avançar ▶</button>
     </div>
-    <div id="resultado"></div>
     <p class="dica">Dica: use as setas ← e → do teclado.</p>
   </section>
 </main>
@@ -114,21 +184,21 @@
 <script>
   // Resposta de exemplo, usada SOMENTE quando a NOX não está conectada (teste da tela)
   const AMOSTRA = [
-    "Etapa 1 - Tokens:", "IDENTIFICADOR(bhaskara) | ...", "",
-    "Etapa 2 - AST:", "FunctionCall(...)", "",
-    "Etapa 3 - Analise semantica:", "Tipos, variaveis e quantidade de argumentos validados.", "",
-    "Etapa 4 - Codigo intermediario TAC:", "t1 = -3", "t2 = bhaskara(1, t1, 2)", "",
-    "Etapa 5 - Execucao e desenvolvimento matematico:",
-    "Equação: a = 1, b = -3, c = 2",
-    "Fórmula do Delta: Δ = b² - 4.a.c",
-    "Valores no lugar: Δ = (-3)² - 4.1.2",
-    "A conta: Δ = 9 - 8 = 1",
-    "Se Δ é maior ou igual a 0, existem raízes reais",
-    "Raíz do Delta: √1 = 1",
-    "Fórmula das raízes: x = (-b ± √Δ) / 2a",
-    "Valores no lugar: x = (3 ± √1) / 2",
-    "Resultado: x1 = 2 e x2 = 1", "",
-    "Resultado final:", "x1 = 2; x2 = 1", ""
+    ">>> bhaskara(1, -3, 2)", "",
+    "Etapa 1 - Simbolos reconhecidos:", "IDENTIFICADOR(bhaskara) | ...", "",
+    "Etapa 5 - Resolucao:", "",
+    "Resolucao da equacao:",
+    "Equacao: 1x² + (-3)x + (2) = 0",
+    "Etapa 1 - Formula do discriminante: Δ = b² - 4 × a × c. O Δ mostra quantas raizes reais a equacao tem.",
+    "Etapa 2 - Substituicao: aqui a = 1, b = -3 e c = 2. Trocando na formula: Δ = (-3)² - 4 × (1) × (2)",
+    "Etapa 3 - Calculo: primeiro o quadrado e o produto, depois a subtracao: Δ = 9 - 8 = 1",
+    "Etapa 4 - Formula resolutiva: x = (-b ± √Δ) / (2a). O ± quer dizer 'mais ou menos': fazemos a conta uma vez com + (x₁) e outra com - (x₂). Como Δ > 0, existem duas raizes reais diferentes.",
+    "Etapa 5 - Substituicao de x₁: usando o sinal +, x₁ = (-(-3) + √1) / (2 × (1))",
+    "Etapa 6 - Calculo de x₁: x₁ = (3 + 1) / 2 = 2",
+    "Etapa 7 - Substituicao de x₂: usando o sinal -, x₂ = (-(-3) - √1) / (2 × (1))",
+    "Etapa 8 - Calculo de x₂: x₂ = (3 - 1) / 2 = 1",
+    "Conclusao: x₁ = 2 e x₂ = 1. Sao os pontos onde a parabola corta o eixo x.", "",
+    "Resposta:", "x1 = 2; x2 = 1", ""
   ].join("\n");
 
   const temPonte = typeof window.LinguagemAluno !== "undefined";
@@ -142,16 +212,136 @@
   // Separa as etapas da Bhaskara do resto da saída da NOX
   function extrairEtapas(texto) {
     const linhas = String(texto).split(/\r?\n/);
-    const ini = linhas.findIndex(l => l.startsWith("Etapa 5"));
-    const fim = linhas.findIndex(l => l.startsWith("Resultado final"));
+    const ini = linhas.findIndex(l => /^Etapa 5 - (Resolu|Execu)/.test(l));
+    const fim = linhas.findIndex(l => l.startsWith("Resposta") || l.startsWith("Resultado final"));
     const limpar = arr => arr.map(s => s.trim()).filter(Boolean);
     if (ini >= 0 && fim > ini) {
       return {
-        passos: limpar(linhas.slice(ini + 1, fim)),
+        passos: limpar(linhas.slice(ini + 1, fim)).filter(l => !/^Resolucao da equacao/.test(l)),
         final: limpar(linhas.slice(fim + 1)).join(" ")
       };
     }
     return { passos: limpar(linhas), final: "" };
+  }
+
+  // ---------- Textos: acentos e separação em número / título / explicação ----------
+  const ACENTOS = [
+    [/\bFormula\b/g, "Fórmula"], [/\bformula\b/g, "fórmula"],
+    [/\bSubstituicao\b/g, "Substituição"], [/\bCalculo\b/g, "Cálculo"],
+    [/\bConclusao\b/g, "Conclusão"], [/\bEquacao\b/g, "Equação"], [/\bequacao\b/g, "equação"],
+    [/\bRaizes\b/g, "Raízes"], [/\braizes\b/g, "raízes"],
+    [/\bNao\b/g, "Não"], [/\bnao\b/g, "não"], [/\bSao\b/g, "São"], [/\bsao\b/g, "são"],
+    [/\bparabola\b/g, "parábola"], [/\bsubtracao\b/g, "subtração"], [/\bnumero\b/g, "número"]
+  ];
+  const acentuar = t => ACENTOS.reduce((s, [re, novo]) => s.replace(re, novo), t);
+
+  function lerPasso(linha) {
+    let m = linha.match(/^Etapa (\d+) - ([^:]+):\s*(.*)$/);
+    let p;
+    if (m) p = { num: m[1], titulo: m[2], corpo: m[3] };
+    else if ((m = linha.match(/^Etapa (\d+) - (.*)$/))) p = { num: m[1], titulo: "O que o Δ diz", corpo: m[2] };
+    else if ((m = linha.match(/^(Equacao|Conclusao): (.*)$/))) {
+      p = { num: m[1] === "Conclusao" ? "✓" : "=", titulo: m[1], corpo: m[2], tipo: m[1] === "Conclusao" ? "fim" : "eq" };
+    } else p = { num: "•", titulo: "", corpo: linha };
+    if (!p.tipo) p.tipo = /x₁|x₂|resolutiva/.test(p.titulo) ? "raiz" : "delta";
+    return { num: p.num, titulo: acentuar(p.titulo), corpo: acentuar(p.corpo), tipo: p.tipo };
+  }
+
+  // ---------- Equação bonita ----------
+  const fmtNum = n => (Math.round(n * 100) / 100).toString().replace(".", ",");
+  function termo(coef, suf, primeiro) {
+    if (coef === 0) return "";
+    const abs = Math.abs(coef);
+    const num = (abs === 1 && suf) ? "" : fmtNum(abs);
+    if (primeiro) return (coef < 0 ? "−" : "") + num + suf;
+    return " " + (coef < 0 ? "−" : "+") + " " + num + suf;
+  }
+  function equacaoBonita(a, b, c) {
+    let t = termo(a, "x²", true);
+    t += termo(b, "x", t === "");
+    t += termo(c, "", t === "");
+    return (t || "0") + " = 0";
+  }
+  function numeroOuNulo(id) {
+    const txt = document.getElementById(id).value.trim().replace(",", ".");
+    const n = Number(txt);
+    return txt !== "" && Number.isFinite(n) ? n : null;
+  }
+  function atualizarEquacao() {
+    const a = numeroOuNulo("a"), b = numeroOuNulo("b"), c = numeroOuNulo("c");
+    const alvo = document.getElementById("eq");
+    alvo.textContent = "";
+    const s = document.createElement("span");
+    s.textContent = (a === null || b === null || c === null) ? "ax² + bx + c = 0" : equacaoBonita(a, b, c);
+    alvo.appendChild(s);
+  }
+
+  // ---------- Gráfico da parábola (SVG, sem bibliotecas) ----------
+  let COEF = { a: 1, b: -3, c: 2 };
+  function passoNice(faixa) {
+    const bruto = faixa / 8, pot = Math.pow(10, Math.floor(Math.log10(bruto)));
+    const f = bruto / pot;
+    return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * pot;
+  }
+  function desenharGrafico(a, b, c) {
+    const W = 640, H = 360, m = { l: 46, r: 22, t: 22, b: 34 };
+    const delta = b * b - 4 * a * c;
+    const xv = -b / (2 * a), yv = a * xv * xv + b * xv + c;
+    let raizes = [], meio = 3;
+    if (delta >= 0) {
+      const s = Math.sqrt(delta);
+      raizes = [(-b + s) / (2 * a), (-b - s) / (2 * a)];
+      meio = Math.max(3, Math.abs(raizes[0] - xv) * 1.6 + 0.6);
+    }
+    const x0 = xv - meio, x1 = xv + meio;
+    const f = x => a * x * x + b * x + c;
+    const baseMin = Math.min(0, yv), baseMax = Math.max(0, yv);
+    const alt = Math.max(baseMax - baseMin, 2) * 1.3;
+    const y0 = a > 0 ? baseMin - alt * 0.12 : baseMin - alt;
+    const y1 = a > 0 ? baseMax + alt : baseMax + alt * 0.12;
+    const sx = x => m.l + (x - x0) / (x1 - x0) * (W - m.l - m.r);
+    const sy = y => H - m.b - (y - y0) / (y1 - y0) * (H - m.t - m.b);
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gráfico da parábola">';
+    const px = passoNice(x1 - x0), py = passoNice(y1 - y0);
+    const eixoY = (x0 <= 0 && 0 <= x1) ? sx(0) : m.l;
+    const eixoX = (y0 <= 0 && 0 <= y1) ? sy(0) : H - m.b;
+    for (let x = Math.ceil(x0 / px) * px; x <= x1; x += px) {
+      svg += '<line class="g-grade" x1="' + sx(x) + '" y1="' + m.t + '" x2="' + sx(x) + '" y2="' + (H - m.b) + '"/>';
+      if (Math.abs(x) > 1e-9) svg += '<text class="g-txt" x="' + sx(x) + '" y="' + (eixoX + 16) + '" text-anchor="middle">' + fmtNum(x) + '</text>';
+    }
+    for (let y = Math.ceil(y0 / py) * py; y <= y1; y += py) {
+      svg += '<line class="g-grade" x1="' + m.l + '" y1="' + sy(y) + '" x2="' + (W - m.r) + '" y2="' + sy(y) + '"/>';
+      if (Math.abs(y) > 1e-9) svg += '<text class="g-txt" x="' + (eixoY - 8) + '" y="' + (sy(y) + 4) + '" text-anchor="end">' + fmtNum(y) + '</text>';
+    }
+    svg += '<line class="g-eixo" x1="' + m.l + '" y1="' + eixoX + '" x2="' + (W - m.r) + '" y2="' + eixoX + '"/>';
+    svg += '<line class="g-eixo" x1="' + eixoY + '" y1="' + m.t + '" x2="' + eixoY + '" y2="' + (H - m.b) + '"/>';
+    svg += '<text class="g-txt" x="' + (W - m.r) + '" y="' + (eixoX - 8) + '" text-anchor="end">x</text>';
+    svg += '<text class="g-txt" x="' + (eixoY + 8) + '" y="' + (m.t + 10) + '">y</text>';
+    let d = "";
+    for (let i = 0; i <= 160; i++) {
+      const x = x0 + (x1 - x0) * i / 160;
+      d += (i ? "L" : "M") + sx(x).toFixed(1) + "," + sy(f(x)).toFixed(1);
+    }
+    svg += '<clipPath id="quadro"><rect x="' + m.l + '" y="' + m.t + '" width="' + (W - m.l - m.r) + '" height="' + (H - m.t - m.b) + '"/></clipPath>';
+    svg += '<path class="g-curva" clip-path="url(#quadro)" d="' + d + '"/>';
+    svg += '<circle class="g-vertice" cx="' + sx(xv) + '" cy="' + sy(yv) + '" r="5"/>';
+    if (Math.abs(sy(yv) - sy(0)) > 40) svg += '<text class="g-vtxt" x="' + (sx(xv) + 10) + '" y="' + (sy(yv) + (a > 0 ? 18 : -10)) + '">vértice</text>';
+    if (delta >= 0) {
+      const duplo = delta === 0;
+      raizes.forEach((r, i) => {
+        if (duplo && i === 1) return;
+        svg += '<circle class="g-raiz" cx="' + sx(r) + '" cy="' + sy(0) + '" r="7"/>';
+        const nome = duplo ? "x₁ = x₂ = " : (i === 0 ? "x₁ = " : "x₂ = ");
+        const lado = duplo ? 0 : (r > xv ? 1 : -1);
+        svg += '<text class="g-raiz-txt" x="' + (sx(r) + lado * 12) + '" y="' + (sy(0) - 14) + '" text-anchor="' + (lado > 0 ? "start" : lado < 0 ? "end" : "middle") + '">' + nome + fmtNum(r) + '</text>';
+      });
+    }
+    svg += '</svg>';
+    document.getElementById("grafico").innerHTML = svg;
+    document.getElementById("legenda").textContent =
+      delta > 0 ? "Δ > 0: a parábola corta o eixo x em dois pontos. Esses pontos são as raízes."
+      : delta === 0 ? "Δ = 0: a parábola apenas encosta no eixo x, em um único ponto (raiz dupla)."
+      : "Δ < 0: a parábola não toca o eixo x, por isso não existem raízes reais.";
   }
 
   const el = id => document.getElementById(id);
@@ -162,21 +352,66 @@
     el("erro").style.display = msg ? "block" : "none";
   }
 
+  function bonitoFinal(txt) {
+    return acentuar(txt).replace(/x1/g, "x₁").replace(/x2/g, "x₂").replace(/;\s*/g, "   e   ");
+  }
+
+  function colunas() {
+    const w = window.innerWidth;
+    return w >= 1100 ? 4 : w >= 760 ? 3 : w >= 520 ? 2 : 1;
+  }
+
   function desenhar() {
-    const lista = el("passos");
-    lista.innerHTML = "";
-    for (let i = 0; i <= atual; i++) {
-      const li = document.createElement("li");
-      li.textContent = passos[i];
-      li.className = i === atual ? "atual" : "antigo";
-      lista.appendChild(li);
+    const n = passos.length, cols = colunas();
+    const quadro = el("tabuleiro");
+    quadro.innerHTML = "";
+    quadro.style.setProperty("--cols", cols);
+    for (let i = 0; i < n; i++) {
+      const p = lerPasso(passos[i]);
+      const linha = Math.floor(i / cols), k = i % cols;
+      const li = document.createElement("div");
+      const dir = k < cols - 1 ? (linha % 2 === 0 ? "r" : "l") : "d";
+      li.className = "passo t-" + p.tipo + " " + dir + (i === atual ? " atual" : i > atual ? " futuro" : "");
+      li.style.gridRow = String(linha + 1);
+      li.style.gridColumn = String(linha % 2 === 0 ? k + 1 : cols - k);
+      const topo = document.createElement("div"); topo.className = "topo-passo";
+      const num = document.createElement("span"); num.className = "num"; num.textContent = p.num;
+      topo.appendChild(num);
+      if (p.titulo) { const t = document.createElement("div"); t.className = "tit"; t.textContent = p.titulo; topo.appendChild(t); }
+      const tx = document.createElement("div"); tx.className = "txt"; tx.textContent = p.corpo;
+      li.appendChild(topo); li.appendChild(tx);
+      quadro.appendChild(li);
     }
-    el("contador").textContent = "Etapa " + (atual + 1) + " de " + passos.length;
+    // casa de chegada: resposta e gráfico
+    const ultimo = atual >= n - 1;
+    const kf = n % cols, restante = cols - kf;
+    const mesmaLinha = kf !== 0 && restante >= 2;
+    const linhaF = mesmaLinha ? Math.floor(n / cols) : Math.ceil(n / cols);
+    const fim = document.createElement("div");
+    fim.className = "chegada" + (ultimo ? " pronta" : "");
+    fim.style.gridRow = String(linhaF + 1);
+    if (mesmaLinha) fim.style.gridColumn = (linhaF % 2 === 0 ? (kf + 1) : 1) + " / span " + restante;
+    else fim.style.gridColumn = "1 / -1";
+    if (ultimo) {
+      if (final) {
+        const rot = document.createElement("span"); rot.className = "rotulo"; rot.textContent = "Resposta";
+        const val = document.createElement("div"); val.className = "valor"; val.textContent = bonitoFinal(final);
+        fim.appendChild(rot); fim.appendChild(val);
+      }
+      const g = document.createElement("div"); g.id = "grafico";
+      const lg = document.createElement("p"); lg.id = "legenda"; lg.className = "legenda";
+      fim.appendChild(g); fim.appendChild(lg);
+    } else {
+      const rot = document.createElement("span"); rot.className = "rotulo"; rot.textContent = "Chegada";
+      const t = document.createElement("div"); t.textContent = "A resposta e o gráfico da parábola aparecem aqui, na última casa.";
+      fim.appendChild(rot); fim.appendChild(t);
+    }
+    quadro.appendChild(fim);
+    if (ultimo) desenharGrafico(COEF.a, COEF.b, COEF.c);
+
+    el("contador").textContent = "Etapa " + (atual + 1) + " de " + n;
     el("voltar").disabled = atual === 0;
-    el("avancar").disabled = atual >= passos.length - 1;
-    const fim = atual >= passos.length - 1 && final;
-    el("resultado").style.display = fim ? "block" : "none";
-    el("resultado").textContent = fim ? "Resultado final: " + final : "";
+    el("avancar").disabled = atual >= n - 1;
   }
 
   function avancar() { if (atual < passos.length - 1) { atual++; desenhar(); } }
@@ -195,7 +430,8 @@
     mostrarErro("");
     try {
       const a = lerNumero("a", "a"), b = lerNumero("b", "b"), c = lerNumero("c", "c");
-      el("eq").textContent = a + "x² + (" + b + ")x + (" + c + ") = 0";
+      COEF = { a: a, b: b, c: c };
+      atualizarEquacao();
       const resposta = await executarNox("bhaskara(" + a + ", " + b + ", " + c + ")");
       if (!resposta.ok) { el("areaPassos").hidden = true; mostrarErro(resposta.erro); return; }
       const r = extrairEtapas(resposta.resultado);
@@ -209,6 +445,7 @@
     }
   });
 
+  ["a", "b", "c"].forEach(id => el(id).addEventListener("input", atualizarEquacao));
   el("avancar").addEventListener("click", avancar);
   el("voltar").addEventListener("click", voltar);
   document.addEventListener("keydown", (ev) => {
@@ -217,6 +454,8 @@
     if (ev.key === "ArrowRight") avancar();
     if (ev.key === "ArrowLeft") voltar();
   });
+  window.addEventListener("resize", () => { if (passos.length) desenhar(); });
+  atualizarEquacao();
 </script>
 </body>
 </html>
