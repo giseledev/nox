@@ -47,14 +47,15 @@ def montar_etapas(a, b, c):
     delta = b2 - quatro_ac
     etapas = [
         f"Equacao: {a}x^2 + ({b})x + ({c}) = 0",
-        "Etapa 1 - Formula do discriminante: delta = b^2 - 4*a*c",
-        f"Etapa 2 - Substituicao: delta = ({b})^2 - 4*({a})*({c})",
-        f"Etapa 3 - Calculo: delta = {_fmt(b2)} - {_fmt(quatro_ac)} = {_fmt(delta)}",
+        "Etapa 1 - Formula do discriminante: delta = b^2 - 4*a*c. O delta mostra quantas raizes reais a equação tem.",
+        f"Etapa 2 - Substituicao: aqui a = {a}, b = {b} e c = {c}. Trocando na formula: delta = ({b})^2 - 4*({a})*({c})",
+        f"Etapa 3 - Calculo: primeiro o quadrado e o produto, depois a subtracao: delta = {_fmt(b2)} - {_fmt(quatro_ac)} = {_fmt(delta)}",
     ]
 
     if delta < 0:
         etapas.append(
-            "Etapa 4 - Como delta < 0, a equacao nao possui raizes reais."
+            "Etapa 4 - Como delta < 0, não existe raiz quadrada real de numero negativo."
+            "A equacao nao possui raizes reais (a parabola nao toca o eixo x)."
         )
         return etapas, []
 
@@ -64,17 +65,23 @@ def montar_etapas(a, b, c):
     numerador_menos = -b - raiz_delta
     x1 = numerador_mais / denominador
     x2 = numerador_menos / denominador
+    
+    if delta == 0:
+        situacao = "Como delta = 0, as duas raizes sao iguais"
+    else:
+        situacao = "Como delta > 0, existem duas raizes reais diferentes"
+
     etapas.extend([
-        "Etapa 4 - Formula resolutiva: x = (-b +/- sqrt(delta)) / (2*a)",
-        f"Etapa 5 - Substituicao: x1 = (-({b}) + sqrt({_fmt(delta)})) / (2*({a}))",
-        f"Etapa 6 - Calculo: x1 = ({_fmt(-b)} + {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x1)}",
-        f"Etapa 7 - Substituicao: x2 = (-({b}) - sqrt({_fmt(delta)})) / (2*({a}))",
-        f"Etapa 8 - Calculo: x2 = ({_fmt(-b)} - {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x2)}",
+        f"Etapa 4 - Formula resolutiva: x = (-b +/- sqrt(delta)) / (2*a). {situacao}: o sinal + gera x1 e o sinal - gera x2.",
+        f"Etapa 5 - Substituicao de x1: usando o sinal +, x1 = (-({b}) + sqrt({_fmt(delta)})) / (2*({a}))",
+        f"Etapa 6 - Calculo de x1: x1 = ({_fmt(-b)} + {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x1)}",
+        f"Etapa 7 - Substituicao de x2: usando o sinal -, x2 = (-({b}) - sqrt({_fmt(delta)})) / (2*({a}))",
+        f"Etapa 8 - Calculo de x2: x2 = ({_fmt(-b)} - {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x2)}",
     ])
     if delta == 0:
-        etapas.append(f"Conclusao: delta = 0; raiz dupla x1 = x2 = {_fmt(x1)}.")
+        etapas.append(f"Conclusao: raiz dupla x1 = x2 = {_fmt(x1)}. A parabola apenas encosta no eixo x.")
     else:
-        etapas.append(f"Conclusao: x1 = {_fmt(x1)} e x2 = {_fmt(x2)}.")
+        etapas.append(f"Conclusao: x1 = {_fmt(x1)} e x2 = {_fmt(x2)}. Sao os pontos onde a parabola corta o eixo x.")
     return etapas, [x1, x2]
 
 
