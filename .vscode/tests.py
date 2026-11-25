@@ -2,6 +2,8 @@ from main import analisar_codigo
 from interpreter import Interpreter, ErroExecucao
 from semantic import Semantica, ErroSemantico
 from funcoes import montar_etapas
+from io import StringIO
+from contextlib import redirect_stdout
 
 def verificar(nome, codigo, esperado):
     resultado = analisar_codigo(codigo, Semantica(), Interpreter())[0]

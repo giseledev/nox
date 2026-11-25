@@ -72,20 +72,43 @@ def montar_etapas(a, b, c):
     b2 = b ** 2
     quatro_ac = 4 * a * c
     delta = b2 - quatro_ac
-    etapas = [f'Equacao: {a}x² + ({b})x + ({c}) = 0', 'Discriminante: Δ = b² - 4ac', f'Substituindo: Δ = ({b})² - 4 × ({a}) × ({c})', f'Calculando: Δ = {_fmt(b2)} - {_fmt(quatro_ac)} = {_fmt(delta)}']
+    etapas = [
+        f"Equacao: {a}x² + ({b})x + ({c}) = 0",
+        "Etapa 1 - Formula do discriminante: Δ = b² - 4 × a × c. O Δ mostra quantas raizes reais a equacao tem.",
+        f"Etapa 2 - Substituicao: aqui a = {a}, b = {b} e c = {c}. Trocando na formula: Δ = ({b})² - 4 × ({a}) × ({c})",
+        f"Etapa 3 - Calculo: primeiro o quadrado e o produto, depois a subtracao: Δ = {_fmt(b2)} - {_fmt(quatro_ac)} = {_fmt(delta)}",
+    ]
+
     if delta < 0:
-        etapas.append('Como Δ é menor que zero, nao existem raizes reais.')
-        return (etapas, [])
+        etapas.append(
+            "Etapa 4 - Como Δ < 0, nao existe raiz quadrada real de numero negativo. "
+            "A equacao nao possui raizes reais (a parabola nao toca o eixo x)."
+        )
+        return etapas, []
+
     raiz_delta = math.sqrt(delta)
     denominador = 2 * a
     x1 = (-b + raiz_delta) / denominador
     x2 = (-b - raiz_delta) / denominador
-    etapas.extend(['Formula resolutiva: x = (-b ± √Δ) / (2a)', f'Raiz quadrada do discriminante: √Δ = √{_fmt(delta)} = {_fmt(raiz_delta)}', f'Primeira raiz: x₁ = ({_fmt(-b)} + {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x1)}', f'Segunda raiz: x₂ = ({_fmt(-b)} - {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x2)}'])
+
     if delta == 0:
-        etapas.append(f'Resultado: raiz dupla x₁ = x₂ = {_fmt(x1)}.')
+        situacao = "Como Δ = 0, as duas raizes sao iguais"
     else:
-        etapas.append(f'Resultado: x₁ = {_fmt(x1)} e x₂ = {_fmt(x2)}.')
-    return (etapas, [x1, x2])
+        situacao = "Como Δ > 0, existem duas raizes reais diferentes"
+
+    etapas.extend([
+        f"Etapa 4 - Formula resolutiva: x = (-b ± √Δ) / (2a). O ± quer dizer 'mais ou menos': fazemos a conta uma vez com + (x₁) e outra com - (x₂). {situacao}.",
+        f"Etapa 5 - Substituicao de x₁: usando o sinal +, x₁ = (-({b}) + √{_fmt(delta)}) / (2 × ({a}))",
+        f"Etapa 6 - Calculo de x₁: x₁ = ({_fmt(-b)} + {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x1)}",
+        f"Etapa 7 - Substituicao de x₂: usando o sinal -, x₂ = (-({b}) - √{_fmt(delta)}) / (2 × ({a}))",
+        f"Etapa 8 - Calculo de x₂: x₂ = ({_fmt(-b)} - {_fmt(raiz_delta)}) / {_fmt(denominador)} = {_fmt(x2)}",
+    ])
+    if delta == 0:
+        etapas.append(f"Conclusao: raiz dupla x₁ = x₂ = {_fmt(x1)}. A parabola apenas encosta no eixo x.")
+    else:
+        etapas.append(f"Conclusao: x₁ = {_fmt(x1)} e x₂ = {_fmt(x2)}. Sao os pontos onde a parabola corta o eixo x.")
+    return etapas, [x1, x2]
+
 
 def bhaskara(a, b, c):
     etapas, raizes = montar_etapas(a, b, c)
