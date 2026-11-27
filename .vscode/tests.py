@@ -34,9 +34,7 @@ for nome, codigo, tipo in [
     except tipo as erro:
         print(f"[OK ERRO] {nome}: {erro}")
     else:
-        raise AssertionError(
-            f"{nome}: era esperado {tipo.__name__}"
-        )
+        raise AssertionError(f"{nome}: era esperado {tipo.__name__}")
 
     
 saida = StringIO()
@@ -51,3 +49,40 @@ with redirect_stdout(saida):
 assert resultado_fatorial == 120
 assert "5! = 5 × 4 × 3 × 2 × 1 = 120" in saida.getvalue()
 print("[OK] fatorial: 5! = 120, com desenvolvimento")
+
+# fatorial: casos especiais
+verificar('fatorial de 0', 'FATORIAL(0)', 1)
+verificar('fatorial de 1', 'FATORIAL(1)', 1)
+verificar('fatorial de 6', 'FATORIAL(6)', 720)
+
+# fatorial: passo a passo na saida
+saida = StringIO()
+with redirect_stdout(saida):
+    analisar_codigo("FATORIAL(5)", Semantica(), Interpreter())
+texto = saida.getvalue()
+assert "Etapa 3 - Multiplicando: 5 × 4 = 20" in texto
+assert "Etapa 5 - Multiplicando: 60 × 2 = 120" in texto
+print("[OK] fatorial: passo a passo das multiplicacoes")
+
+# grafico: vertice, raizes e pontos
+saida = StringIO()
+with redirect_stdout(saida):
+    analisar_codigo("GRAFICO(1, -3, 2)", Semantica(), Interpreter())
+texto = saida.getvalue()
+assert "vertice = 1.5; -0.25" in texto
+assert "raizes = 2; 1" in texto
+assert texto.count(" | ") == 60  # 61 pontos tem 60 separadores
+print("[OK] grafico: vertice, raizes e 61 pontos")
+
+saida = StringIO()
+with redirect_stdout(saida):
+    analisar_codigo("GRAFICO(1, 0, 4)", Semantica(), Interpreter())
+assert "raizes = nenhuma" in saida.getvalue()
+print("[OK] grafico: sem raizes reais")
+
+try:
+    analisar_codigo("GRAFICO(0, 2, 1)", Semantica(), Interpreter())
+except ErroExecucao as erro:
+    print(f"[OK ERRO] grafico com a zero: {erro}")
+else:
+    raise AssertionError("grafico com a zero: era esperado ErroExecucao")

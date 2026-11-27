@@ -20,43 +20,50 @@ def raiz(numero):
         raise ValueError('RAIZ nao aceita numeros negativos.')
     return math.sqrt(numero)
 
+
+
+
+
+
+
+
 def fatorial(numero):
     if not isinstance(numero, (int, float)) or isinstance(numero, bool):
-        raise ValueError(
-            "FATORIAL exige um numero inteiro nao negativo."
-        )
-
+        raise ValueError("FATORIAL exige um numero inteiro nao negativo.")
     if numero < 0:
-        raise ValueError(
-            "FATORIAL exige um numero inteiro nao negativo."
-        )
-
+        raise ValueError("FATORIAL exige um numero inteiro nao negativo.")
     if isinstance(numero, float):
         if not math.isfinite(numero) or not numero.is_integer():
-            raise ValueError(
-                "FATORIAL exige um numero inteiro nao negativo."
-            )
-
+            raise ValueError("FATORIAL exige um numero inteiro nao negativo.")
     numero = int(numero)
-    resultado = 1
 
+    print("\nPasso a passo do fatorial:")
+    print("Etapa 1 - Definicao: n! = produto de n por todos os inteiros positivos menores que ele.")
     if numero < 2:
-        desenvolvimento = f"{numero}! = 1"
-    else:
-        fatores = " × ".join(
-            str(valor)
-            for valor in range(numero, 0, -1)
-        )
+        print(f"Etapa 2 - Caso especial: {numero}! vale 1 por definicao.")
+        print(f"Conclusao: {numero}! = 1.")
+        return 1
 
-        for valor in range(2, numero + 1):
-            resultado *= valor
-
-        desenvolvimento = (
-            f"{numero}! = {fatores} = {resultado}"
-        )
-
-    print(f"Desenvolvimento do fatorial: {desenvolvimento}")
+    fatores = list(range(numero, 0, -1))
+    expansao = " × ".join(str(v) for v in fatores)
+    print(f"Etapa 2 - Expansao: {numero}! = {expansao}")
+    resultado = numero
+    etapa = 3
+    for valor in range(numero - 1, 1, -1):
+        anterior = resultado
+        resultado *= valor
+        print(f"Etapa {etapa} - Multiplicando: {anterior} × {valor} = {resultado}")
+        etapa += 1
+    print(f"Conclusao: {numero}! = {expansao} = {resultado}.")
     return resultado
+
+
+
+
+
+
+
+
 
 def _fmt(numero):
     if math.isclose(numero, round(numero), abs_tol=1e-12):
@@ -116,9 +123,41 @@ def bhaskara(a, b, c):
     for etapa in etapas:
         print(etapa)
     return raizes
+
+
+def grafico(a, b, c):
+    for nome, valor in (('a', a), ('b', b), ('c', c)):
+        if not isinstance(valor, (int, float)) or isinstance(valor, bool):
+            raise ValueError(f"O coeficiente '{nome}' deve ser numerico.")
+    if a == 0:
+        raise ValueError("Nao e uma equacao do segundo grau: o coeficiente 'a' nao pode ser zero.")
+    xv = -b / (2 * a)
+    yv = a * xv ** 2 + b * xv + c
+    delta = b ** 2 - 4 * a * c
+    meia = 3.0
+    raizes = []
+    if delta >= 0:
+        rd = math.sqrt(delta)
+        raizes = [(-b + rd) / (2 * a), (-b - rd) / (2 * a)]
+        meia = max(meia, 1.5 * abs(raizes[0] - xv))
+    xmin = min(xv - meia, -1.0)
+    xmax = max(xv + meia, 1.0)
+    passos = 60
+    pontos = []
+    for i in range(passos + 1):
+        x = xmin + (xmax - xmin) * i / passos
+        pontos.append(f"{x:.4f},{a * x * x + b * x + c:.4f}")
+    print("\nDados do grafico:")
+    print(f"vertice = {_fmt(xv)}; {_fmt(yv)}")
+    print("raizes = " + ("; ".join(_fmt(r) for r in raizes) if raizes else "nenhuma"))
+    print("janela = " + f"{xmin:.4f}; {xmax:.4f}")
+    print("pontos = " + " | ".join(pontos))
+    return yv
+
 FUNCOES = {
     "POTENCIA": (2, potencia),
     "RAIZ": (1, raiz),
     "BHASKARA": (3, bhaskara),
     "FATORIAL": (1, fatorial),
+    "GRAFICO": (3, grafico),
 }
