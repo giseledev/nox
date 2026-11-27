@@ -64,6 +64,13 @@
   button:disabled { opacity: .4; cursor: not-allowed; }
   button:focus-visible, input:focus-visible { outline: 3px solid var(--caneta); outline-offset: 2px; }
 
+  [hidden] { display: none !important; }
+  .abas { display: flex; gap: 8px; margin: 0 0 14px; }
+  .aba {
+    font: 600 1rem var(--manuscrito); padding: 8px 18px; border-radius: 999px; cursor: pointer;
+    background: var(--folha); color: var(--tinta-suave); border: 2px solid var(--borda);
+  }
+  .aba[aria-selected="true"] { background: var(--caneta); color: #fff; border-color: var(--caneta); }
   .topo { display: flex; gap: 20px 28px; align-items: center; flex-wrap: wrap; }
   .equacao {
     flex: 1; min-width: 240px; text-align: center;
@@ -148,8 +155,12 @@
 </head>
 <body>
 <main>
-  <h1>Equação do 2º grau</h1>
-  <p class="sub">Digite a, b e c e veja a resolução passo a passo.</p>
+  <h1 id="titulo">Equação do 2º grau</h1>
+  <div class="abas" role="tablist" aria-label="Escolha a função da NOX">
+    <button type="button" class="aba" role="tab" id="abaB" aria-selected="true" title="Resolve equações do 2º grau com a fórmula de Bhaskara">Bhaskara</button>
+    <button type="button" class="aba" role="tab" id="abaF" aria-selected="false" title="Multiplica n por todos os inteiros positivos menores que ele">Fatorial</button>
+  </div>
+  <p class="sub" id="subtitulo">Digite a, b e c e veja a resolução passo a passo.</p>
   <p class="sub"><b>Clique em Avançar</b> para ver a próxima etapa.</p>
 
   <div id="aviso" class="aviso">
@@ -158,9 +169,10 @@
 
   <section class="folha topo">
     <form id="form" class="campos">
-      <label>a <input id="a" inputmode="decimal" value="1" autocomplete="off"></label>
-      <label>b <input id="b" inputmode="decimal" value="-3" autocomplete="off"></label>
-      <label>c <input id="c" inputmode="decimal" value="2" autocomplete="off"></label>
+      <label class="so-b">a <input id="a" inputmode="decimal" value="1" autocomplete="off"></label>
+      <label class="so-b">b <input id="b" inputmode="decimal" value="-3" autocomplete="off"></label>
+      <label class="so-b">c <input id="c" inputmode="decimal" value="2" autocomplete="off"></label>
+      <label class="so-f" hidden>n <input id="n" inputmode="numeric" value="5" autocomplete="off"></label>
       <button type="submit" class="principal">Resolver</button>
     </form>
     <div class="equacao" id="eq" aria-live="polite"></div>
@@ -201,12 +213,22 @@
     "Resposta:", "x1 = 2; x2 = 1", ""
   ].join("\n");
 
+  const AMOSTRA_FAT = [
+    ">>> fatorial(5)", "", "Etapa 5 - Resolucao:", "", "Passo a passo do fatorial:",
+    "Etapa 1 - Definicao: n! = produto de n por todos os inteiros positivos menores que ele.",
+    "Etapa 2 - Expansao: 5! = 5 × 4 × 3 × 2 × 1",
+    "Etapa 3 - Multiplicando: 5 × 4 = 20",
+    "Etapa 4 - Multiplicando: 20 × 3 = 60",
+    "Etapa 5 - Multiplicando: 60 × 2 = 120",
+    "Conclusao: 5! = 5 × 4 × 3 × 2 × 1 = 120.", "", "Resposta:", "120", ""
+  ].join("\n");
+  let OP = "bhaskara";
   const temPonte = typeof window.LinguagemAluno !== "undefined";
   if (!temPonte) document.getElementById("aviso").style.display = "block";
 
   async function executarNox(codigo) {
     if (temPonte) return await window.LinguagemAluno.executar(codigo);
-    return { ok: true, resultado: AMOSTRA };
+    return { ok: true, resultado: codigo.startsWith("fatorial") ? AMOSTRA_FAT : AMOSTRA };
   }
 
   // Separa as etapas da Bhaskara do resto da saída da NOX
@@ -217,7 +239,7 @@
     const limpar = arr => arr.map(s => s.trim()).filter(Boolean);
     if (ini >= 0 && fim > ini) {
       return {
-        passos: limpar(linhas.slice(ini + 1, fim)).filter(l => !/^Resolucao da equacao/.test(l)),
+        passos: limpar(linhas.slice(ini + 1, fim)).filter(l => !/^(Resolucao da equacao|Passo a passo do fatorial)/.test(l)),
         final: limpar(linhas.slice(fim + 1)).join(" ")
       };
     }
@@ -226,6 +248,7 @@
 
   // ---------- Textos: acentos e separação em número / título / explicação ----------
   const ACENTOS = [
+    [/\bdefinicao\b/g, "definição"], [/\bDefinicao\b/g, "Definição"], [/\bExpansao\b/g, "Expansão"], [/\bmultiplicacao\b/g, "multiplicação"],
     [/\bFormula\b/g, "Fórmula"], [/\bformula\b/g, "fórmula"],
     [/\bSubstituicao\b/g, "Substituição"], [/\bCalculo\b/g, "Cálculo"],
     [/\bConclusao\b/g, "Conclusão"], [/\bEquacao\b/g, "Equação"], [/\bequacao\b/g, "equação"],
@@ -268,16 +291,38 @@
     return txt !== "" && Number.isFinite(n) ? n : null;
   }
   function atualizarEquacao() {
-    const a = numeroOuNulo("a"), b = numeroOuNulo("b"), c = numeroOuNulo("c");
     const alvo = document.getElementById("eq");
     alvo.textContent = "";
     const s = document.createElement("span");
+    if (OP === "fatorial") {
+      const n = numeroOuNulo("n");
+      s.textContent = n === null ? "n! = ?" : fmtNum(n) + "! = ?";
+      alvo.appendChild(s);
+      return;
+    }
+    const a = numeroOuNulo("a"), b = numeroOuNulo("b"), c = numeroOuNulo("c");
     s.textContent = (a === null || b === null || c === null) ? "ax² + bx + c = 0" : equacaoBonita(a, b, c);
     alvo.appendChild(s);
   }
 
   // ---------- Gráfico da parábola (SVG, sem bibliotecas) ----------
   let COEF = { a: 1, b: -3, c: 2 };
+  let DADOS = null; // dados do gráfico calculados pela NOX (função GRAFICO)
+
+  function lerDadosGrafico(texto) {
+    const pega = nome => {
+      const m = String(texto).match(new RegExp("^" + nome + " = (.*)$", "m"));
+      return m ? m[1].trim() : null;
+    };
+    const v = pega("vertice"), r = pega("raizes"), j = pega("janela"), p = pega("pontos");
+    if (!v || !r || !j || !p) return null;
+    const nums = t => t.split(";").map(Number);
+    const vert = nums(v), jan = nums(j);
+    const pontos = p.split("|").map(q => q.trim().split(",").map(Number));
+    const raizes = r === "nenhuma" ? [] : nums(r);
+    if ([...vert, ...jan].some(isNaN) || pontos.some(q => q.length !== 2 || q.some(isNaN)) || raizes.some(isNaN)) return null;
+    return { xv: vert[0], yv: vert[1], raizes: raizes, x0: jan[0], x1: jan[1], pontos: pontos };
+  }
   function passoNice(faixa) {
     const bruto = faixa / 8, pot = Math.pow(10, Math.floor(Math.log10(bruto)));
     const f = bruto / pot;
@@ -286,14 +331,16 @@
   function desenharGrafico(a, b, c) {
     const W = 640, H = 360, m = { l: 46, r: 22, t: 22, b: 34 };
     const delta = b * b - 4 * a * c;
-    const xv = -b / (2 * a), yv = a * xv * xv + b * xv + c;
+    let xv = -b / (2 * a), yv = a * xv * xv + b * xv + c;
+    if (DADOS) { xv = DADOS.xv; yv = DADOS.yv; }
     let raizes = [], meio = 3;
     if (delta >= 0) {
       const s = Math.sqrt(delta);
       raizes = [(-b + s) / (2 * a), (-b - s) / (2 * a)];
       meio = Math.max(3, Math.abs(raizes[0] - xv) * 1.6 + 0.6);
     }
-    const x0 = xv - meio, x1 = xv + meio;
+    let x0 = xv - meio, x1 = xv + meio;
+    if (DADOS) { raizes = DADOS.raizes; x0 = DADOS.x0; x1 = DADOS.x1; }
     const f = x => a * x * x + b * x + c;
     const baseMin = Math.min(0, yv), baseMax = Math.max(0, yv);
     const alt = Math.max(baseMax - baseMin, 2) * 1.3;
@@ -318,10 +365,8 @@
     svg += '<text class="g-txt" x="' + (W - m.r) + '" y="' + (eixoX - 8) + '" text-anchor="end">x</text>';
     svg += '<text class="g-txt" x="' + (eixoY + 8) + '" y="' + (m.t + 10) + '">y</text>';
     let d = "";
-    for (let i = 0; i <= 160; i++) {
-      const x = x0 + (x1 - x0) * i / 160;
-      d += (i ? "L" : "M") + sx(x).toFixed(1) + "," + sy(f(x)).toFixed(1);
-    }
+    const pts = DADOS ? DADOS.pontos : Array.from({ length: 161 }, (_, i) => { const x = x0 + (x1 - x0) * i / 160; return [x, f(x)]; });
+    pts.forEach((q, i) => { d += (i ? "L" : "M") + sx(q[0]).toFixed(1) + "," + sy(q[1]).toFixed(1); });
     svg += '<clipPath id="quadro"><rect x="' + m.l + '" y="' + m.t + '" width="' + (W - m.l - m.r) + '" height="' + (H - m.t - m.b) + '"/></clipPath>';
     svg += '<path class="g-curva" clip-path="url(#quadro)" d="' + d + '"/>';
     svg += '<circle class="g-vertice" cx="' + sx(xv) + '" cy="' + sy(yv) + '" r="5"/>';
@@ -398,16 +443,18 @@
         const val = document.createElement("div"); val.className = "valor"; val.textContent = bonitoFinal(final);
         fim.appendChild(rot); fim.appendChild(val);
       }
-      const g = document.createElement("div"); g.id = "grafico";
-      const lg = document.createElement("p"); lg.id = "legenda"; lg.className = "legenda";
-      fim.appendChild(g); fim.appendChild(lg);
+      if (OP === "bhaskara") {
+        const g = document.createElement("div"); g.id = "grafico";
+        const lg = document.createElement("p"); lg.id = "legenda"; lg.className = "legenda";
+        fim.appendChild(g); fim.appendChild(lg);
+      }
     } else {
       const rot = document.createElement("span"); rot.className = "rotulo"; rot.textContent = "Chegada";
-      const t = document.createElement("div"); t.textContent = "A resposta e o gráfico da parábola aparecem aqui, na última casa.";
+      const t = document.createElement("div"); t.textContent = OP === "bhaskara" ? "A resposta e o gráfico da parábola aparecem aqui, na última casa." : "A resposta aparece aqui, na última casa.";
       fim.appendChild(rot); fim.appendChild(t);
     }
     quadro.appendChild(fim);
-    if (ultimo) desenharGrafico(COEF.a, COEF.b, COEF.c);
+    if (ultimo && OP === "bhaskara") desenharGrafico(COEF.a, COEF.b, COEF.c);
 
     el("contador").textContent = "Etapa " + (atual + 1) + " de " + n;
     el("voltar").disabled = atual === 0;
@@ -429,6 +476,18 @@
     ev.preventDefault();
     mostrarErro("");
     try {
+      if (OP === "fatorial") {
+        const n = lerNumero("n", "n");
+        atualizarEquacao();
+        const rf = await executarNox("fatorial(" + n + ")");
+        if (!rf.ok) { el("areaPassos").hidden = true; mostrarErro(rf.erro); return; }
+        const ef = extrairEtapas(rf.resultado);
+        if (ef.passos.length === 0) { el("areaPassos").hidden = true; mostrarErro("A NOX não devolveu nenhuma etapa."); return; }
+        passos = ef.passos; final = ef.final; atual = 0; DADOS = null;
+        el("areaPassos").hidden = false;
+        desenhar();
+        return;
+      }
       const a = lerNumero("a", "a"), b = lerNumero("b", "b"), c = lerNumero("c", "c");
       COEF = { a: a, b: b, c: c };
       atualizarEquacao();
@@ -437,6 +496,11 @@
       const r = extrairEtapas(resposta.resultado);
       if (r.passos.length === 0) { el("areaPassos").hidden = true; mostrarErro("A NOX não devolveu nenhuma etapa."); return; }
       passos = r.passos; final = r.final; atual = 0;
+      DADOS = null;
+      try {
+        const g = await executarNox("grafico(" + a + ", " + b + ", " + c + ")");
+        if (g.ok) DADOS = lerDadosGrafico(g.resultado);
+      } catch (_) { DADOS = null; }
       el("areaPassos").hidden = false;
       desenhar();
     } catch (e) {
@@ -445,7 +509,21 @@
     }
   });
 
-  ["a", "b", "c"].forEach(id => el(id).addEventListener("input", atualizarEquacao));
+  function trocarAba(op) {
+    OP = op;
+    const f = op === "fatorial";
+    document.querySelectorAll(".so-b").forEach(x => x.hidden = f);
+    document.querySelectorAll(".so-f").forEach(x => x.hidden = !f);
+    el("abaB").setAttribute("aria-selected", String(!f));
+    el("abaF").setAttribute("aria-selected", String(f));
+    el("titulo").textContent = f ? "Fatorial" : "Equação do 2º grau";
+    el("subtitulo").textContent = f ? "Digite n e veja a multiplicação passo a passo." : "Digite a, b e c e veja a resolução passo a passo.";
+    el("areaPassos").hidden = true; passos = []; mostrarErro("");
+    atualizarEquacao();
+  }
+  el("abaB").addEventListener("click", () => trocarAba("bhaskara"));
+  el("abaF").addEventListener("click", () => trocarAba("fatorial"));
+  ["a", "b", "c", "n"].forEach(id => el(id).addEventListener("input", atualizarEquacao));
   el("avancar").addEventListener("click", avancar);
   el("voltar").addEventListener("click", voltar);
   document.addEventListener("keydown", (ev) => {
